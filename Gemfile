@@ -35,6 +35,7 @@ platform :ruby do
   gem 'mongo', '= 1.6.2'
   gem 'bson', '= 1.6.2'
   gem 'bson_ext', '= 1.6.2'
+  gem 'unicorn'
 end
 
 gem 'ri_cal'
