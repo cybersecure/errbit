@@ -24,12 +24,12 @@ unless defined?(Errbit::Config)
     Errbit::Config.github_access_scope = ENV['GITHUB_ACCESS_SCOPE'].split(',').map(&:strip) if ENV['GITHUB_ACCESS_SCOPE']
 
     Errbit::Config.smtp_settings = {
-      :address        => "smtp.sendgrid.net",
-      :port           => "25",
+      :address        => ENV['SMTP_SERVER'] || 'smtp.sendgrid.net',
+      :port           => ENV['SMTP_PORT']   || 25,
       :authentication => :plain,
-      :user_name      => ENV['SENDGRID_USERNAME'],
-      :password       => ENV['SENDGRID_PASSWORD'],
-      :domain         => ENV['SENDGRID_DOMAIN']
+      :user_name      => ENV['SMTP_USERNAME']   || ENV['SENDGRID_USERNAME'],
+      :password       => ENV['SMTP_PASSWORD']   || ENV['SENDGRID_PASSWORD'],
+      :domain         => ENV['SENDGRID_DOMAIN'] || ENV['ERRBIT_EMAIL_FROM'].split('@').last
     }
   end
 
@@ -59,6 +59,9 @@ default_config = YAML.load_file(default_config_file)
 default_config.each do |k,v|
   Errbit::Config.send("#{k}=", v) if Errbit::Config.send(k) === nil
 end
+
+# Disable GitHub oauth if gem is missing
+Errbit::Config.github_authentication = false unless defined?(OmniAuth::Strategies::GitHub)
 
 # Set SMTP settings if given.
 if smtp = Errbit::Config.smtp_settings
